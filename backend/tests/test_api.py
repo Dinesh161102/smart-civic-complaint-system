@@ -291,3 +291,30 @@ def test_ai_classification_endpoint():
     assert res.status_code == 200
     data = res.json()
     assert data["category"] == "Streetlight"
+
+
+def test_database_production_fails_when_unreachable(monkeypatch):
+    from app.database import DatabaseManager
+    from app.config import settings
+    
+    manager = DatabaseManager()
+    monkeypatch.setattr(settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr("app.database.MongoClient", lambda *args, **kwargs: (_ for _ in ()).throw(Exception("Atlas connection timed out")))
+    
+    with pytest.raises(RuntimeError) as exc_info:
+        manager.connect()
+    assert "Production database connection failed" in str(exc_info.value)
+
+
+def test_database_development_falls_back_to_mongomock(monkeypatch):
+    from app.database import DatabaseManager
+    from app.config import settings
+    
+    manager = DatabaseManager()
+    monkeypatch.setattr(settings, "ENVIRONMENT", "development")
+    monkeypatch.setattr("app.database.MongoClient", lambda *args, **kwargs: (_ for _ in ()).throw(Exception("Local MongoDB offline")))
+    
+    manager.connect()
+    assert manager.is_mock is True
+    assert manager.db is not None
+

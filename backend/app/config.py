@@ -5,6 +5,7 @@ load_dotenv()
 
 class Settings:
     PROJECT_NAME: str = "Smart Civic Complaint & Issue Management System"
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     MONGODB_URL: str = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
     DATABASE_NAME: str = os.getenv("DATABASE_NAME", "civic_complaints_db")
     

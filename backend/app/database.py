@@ -14,8 +14,8 @@ class DatabaseManager:
 
     def connect(self):
         try:
-            # Attempt connection to real MongoDB instance with a short timeout
-            client = MongoClient(settings.MONGODB_URL, serverSelectionTimeoutMS=2000)
+            # Attempt connection to real MongoDB instance with 5000ms timeout
+            client = MongoClient(settings.MONGODB_URL, serverSelectionTimeoutMS=5000)
             client.admin.command('ping')
             self.client = client
             self.db = self.client[settings.DATABASE_NAME]
@@ -26,12 +26,21 @@ class DatabaseManager:
             print(f" [DATABASE NAME]   {settings.DATABASE_NAME}", flush=True)
             print("=" * 65 + "\n", flush=True)
         except Exception as e:
+            is_production = getattr(settings, "ENVIRONMENT", "development").lower() == "production"
+            if is_production:
+                print("\n" + "=" * 65, flush=True)
+                print(f" [MONGODB FATAL ERROR] Failed to connect to MongoDB Atlas in production: {str(e)}", flush=True)
+                print(f" [MONGODB URL]         {settings.MONGODB_URL}", flush=True)
+                print("=" * 65 + "\n", flush=True)
+                raise RuntimeError(f"Production database connection failed: Unable to connect to MongoDB ({str(e)})") from e
+
+            # For non-production (development / testing), fall back to Mongomock
             self.client = mongomock.MongoClient()
             self.db = self.client[settings.DATABASE_NAME]
             self.is_mock = True
             print("\n" + "=" * 65, flush=True)
             print(f" [MONGODB WARNING] Could not connect to real MongoDB ({str(e)})", flush=True)
-            print(f" [MONGODB FALLBACK] Using Mongomock in-memory database", flush=True)
+            print(f" [MONGODB FALLBACK] Using Mongomock in-memory database (development mode)", flush=True)
             print("=" * 65 + "\n", flush=True)
 
     def get_collection(self, collection_name: str):
