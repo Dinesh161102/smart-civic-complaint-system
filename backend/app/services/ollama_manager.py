@@ -52,18 +52,23 @@ def find_ollama_executable() -> Optional[str]:
 
 def _start_ollama_worker():
     """Background worker that probes and starts Ollama if not already running."""
-    if is_ollama_running(timeout=1.0):
-        print(" [OLLAMA STATUS]  ONLINE (Already running on localhost:11434)", flush=True)
-        return
-
-    ollama_path = find_ollama_executable()
-    if not ollama_path:
-        print(" [OLLAMA STATUS]  NOT DETECTED (Ollama not found on PATH or standard directories. Local NLP fallback active.)", flush=True)
-        return
-
-    print(f" [OLLAMA STATUS]  STARTING BACKGROUND SERVICE ({ollama_path} serve)...", flush=True)
-
     try:
+        enable_ollama = os.getenv("ENABLE_OLLAMA", "true").lower() in ("true", "1", "yes")
+        if not enable_ollama:
+            print(" [OLLAMA STATUS]  DISABLED (ENABLE_OLLAMA=false. Built-in NLP fallback active.)", flush=True)
+            return
+
+        if is_ollama_running(timeout=1.0):
+            print(" [OLLAMA STATUS]  ONLINE (Already running on localhost:11434)", flush=True)
+            return
+
+        ollama_path = find_ollama_executable()
+        if not ollama_path:
+            print(" [OLLAMA STATUS]  NOT DETECTED (Ollama binary not found. Local NLP fallback active.)", flush=True)
+            return
+
+        print(f" [OLLAMA STATUS]  STARTING BACKGROUND SERVICE ({ollama_path} serve)...", flush=True)
+
         creationflags = 0
         if sys.platform == "win32":
             # DETACHED_PROCESS = 0x00000008, CREATE_NEW_PROCESS_GROUP = 0x00000200, CREATE_NO_WINDOW = 0x08000000
@@ -77,8 +82,8 @@ def _start_ollama_worker():
             creationflags=creationflags
         )
 
-        # Probe for readiness up to 5 seconds
-        deadline = time.monotonic() + 5.0
+        # Probe for readiness up to 3 seconds
+        deadline = time.monotonic() + 3.0
         while time.monotonic() < deadline:
             if is_ollama_running(timeout=0.5):
                 print(" [OLLAMA STATUS]  ONLINE (Ollama background process started and ready)", flush=True)
@@ -87,13 +92,19 @@ def _start_ollama_worker():
 
         print(" [OLLAMA STATUS]  STARTING (Process launched; local NLP fallback active until fully ready)", flush=True)
     except Exception as exc:
-        print(f" [OLLAMA STATUS]  NOTICE: Could not start Ollama automatically ({exc}). Using local NLP fallback.", flush=True)
+        print(f" [OLLAMA STATUS]  NOTICE: Ollama service unavailable ({exc}). Using local NLP fallback.", flush=True)
 
 def ensure_ollama_running(async_mode: bool = True):
     """
     Checks if Ollama is running, and starts it in the background if needed.
     Runs asynchronously by default so it never blocks FastAPI startup.
+    Respects ENABLE_OLLAMA environment variable with production safety.
     """
+    enable_ollama = os.getenv("ENABLE_OLLAMA", "true").lower() in ("true", "1", "yes")
+    if not enable_ollama:
+        print(" [OLLAMA STATUS]  DISABLED (ENABLE_OLLAMA=false. Built-in NLP fallback active.)", flush=True)
+        return
+
     if async_mode:
         thread = threading.Thread(target=_start_ollama_worker, daemon=True, name="OllamaLauncherThread")
         thread.start()

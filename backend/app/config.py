@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Settings:
     PROJECT_NAME: str = "Smart Civic Complaint & Issue Management System"
@@ -29,5 +32,21 @@ class Settings:
         "Parks & Tree": 2.0,
         "Other": 2.0
     }
+    
+    # AI Engine & Local LLM (Ollama)
+    ENABLE_OLLAMA: bool = os.getenv("ENABLE_OLLAMA", "true").lower() in ("true", "1", "yes")
+    OLLAMA_URL: str = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "qwen2.5:1.5b-instruct")
+    OLLAMA_TIMEOUT: float = float(os.getenv("OLLAMA_TIMEOUT", "3.0"))
+
+    # CORS Allowed Origins
+    ALLOWED_ORIGINS: list = [
+        origin.strip()
+        for origin in os.getenv(
+            "ALLOWED_ORIGINS",
+            "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+        ).split(",")
+        if origin.strip()
+    ]
 
 settings = Settings()

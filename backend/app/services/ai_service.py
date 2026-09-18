@@ -4,9 +4,12 @@ import os
 import urllib.request
 from typing import Dict, Any, Optional
 from pydantic import BaseModel, Field, field_validator
+from app.config import settings
 
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:1.5b-instruct")
+OLLAMA_URL = settings.OLLAMA_URL
+OLLAMA_MODEL = settings.OLLAMA_MODEL
+ENABLE_OLLAMA = settings.ENABLE_OLLAMA
+OLLAMA_TIMEOUT = settings.OLLAMA_TIMEOUT
 
 # Backend Baseline Categories (Strictly Enforced)
 VALID_CATEGORIES = [
@@ -173,9 +176,10 @@ def fallback_nlp_analyze(text: str) -> Dict[str, Any]:
 def analyze_complaint_with_ai(description: str) -> Dict[str, Any]:
     """
     Analyzes a natural language complaint description:
-    1. Sends prompt to local Ollama instance (qwen2.5:1.5b-instruct).
-    2. Validates JSON and schema using Pydantic AIAnalysisResult.
-    3. Seamlessly falls back to local NLP engine if Ollama is unreachable.
+    1. Checks if Ollama is enabled (ENABLE_OLLAMA). If disabled, immediately uses local NLP engine.
+    2. Sends prompt to local Ollama instance (qwen2.5:1.5b-instruct).
+    3. Validates JSON and schema using Pydantic AIAnalysisResult.
+    4. Seamlessly falls back to local NLP engine if Ollama is unreachable, offline, or times out.
     """
     if not description or not description.strip():
         return {
@@ -184,6 +188,12 @@ def analyze_complaint_with_ai(description: str) -> Dict[str, Any]:
             "issue": "Empty description provided.",
             "location": None
         }
+
+    # Production Safe Guard: If Ollama is disabled via environment variable, use local NLP immediately
+    if not ENABLE_OLLAMA:
+        fallback_res = fallback_nlp_analyze(description)
+        validated = AIAnalysisResult(**fallback_res)
+        return validated.model_dump()
 
     system_prompt = (
         "You are an expert municipal civic issue classifier for a smart city complaint system. "
@@ -222,7 +232,7 @@ def analyze_complaint_with_ai(description: str) -> Dict[str, Any]:
             data=body,
             headers={"Content-Type": "application/json"}
         )
-        with urllib.request.urlopen(req, timeout=12) as resp:
+        with urllib.request.urlopen(req, timeout=OLLAMA_TIMEOUT) as resp:
             resp_data = json.loads(resp.read().decode('utf-8'))
             response_text = resp_data.get("response", "").strip()
             
@@ -234,7 +244,7 @@ def analyze_complaint_with_ai(description: str) -> Dict[str, Any]:
             parsed_json = json.loads(response_text)
             validated = AIAnalysisResult(**parsed_json)
             return validated.model_dump()
-    except Exception as e:
+    except Exception:
         # Graceful fallback to local NLP engine if Ollama is unreachable, offline, or times out
         fallback_res = fallback_nlp_analyze(description)
         validated = AIAnalysisResult(**fallback_res)

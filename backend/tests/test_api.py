@@ -55,6 +55,7 @@ def test_ollama_startup_guard_starts_when_needed(monkeypatch):
 
     called = {"popen": False}
 
+    monkeypatch.setenv("ENABLE_OLLAMA", "true")
     monkeypatch.setattr("app.services.ollama_manager.is_ollama_running", lambda timeout=1.5: False)
     monkeypatch.setattr("app.services.ollama_manager.find_ollama_executable", lambda: "/usr/bin/ollama")
     monkeypatch.setattr(
