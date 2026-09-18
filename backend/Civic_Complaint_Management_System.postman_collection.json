@@ -1,0 +1,736 @@
+{
+  "info": {
+    "_postman_id": "c1a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c",
+    "name": "Smart Civic Complaint Management System with JWT RBAC",
+    "description": "Comprehensive Postman Collection for verifying JWT Authentication and Role-Based Access Control (RBAC) across Citizen and Municipal Officer roles.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "officer_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "citizen_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "complaint_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ticket_number",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Authentication & User Management",
+      "item": [
+        {
+          "name": "01.1 - Login Municipal Officer (Default Seed)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"JWT access token returned for Municipal Officer\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.access_token).to.be.a('string').that.is.not.empty;",
+                  "    pm.expect(jsonData.user.role).to.eql(\"Municipal Officer\");",
+                  "    pm.collectionVariables.set(\"officer_token\", jsonData.access_token);",
+                  "    pm.collectionVariables.set(\"token\", jsonData.access_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"officer@civic.gov\",\n  \"password\": \"Officer123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Authenticates default Municipal Officer and sets officer_token collection variable."
+          }
+        },
+        {
+          "name": "01.2 - Register Citizen (Public)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Citizen user created with role Citizen\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user.role).to.eql(\"Citizen\");",
+                  "    pm.collectionVariables.set(\"citizen_token\", jsonData.access_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"citizen@civic.gov\",\n  \"password\": \"Citizen123!\",\n  \"full_name\": \"Jane Citizen\",\n  \"phone\": \"+1-555-0102\",\n  \"role\": \"Citizen\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Public registration for Citizen accounts."
+          }
+        },
+        {
+          "name": "01.3 - Login Citizen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"JWT access token returned for Citizen\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.access_token).to.be.a('string');",
+                  "    pm.collectionVariables.set(\"citizen_token\", jsonData.access_token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"citizen@civic.gov\",\n  \"password\": \"Citizen123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Authenticates Citizen user and saves token."
+          }
+        },
+        {
+          "name": "01.4 - Get My Profile (Authenticated)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Authenticated profile returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "    pm.expect(jsonData).to.have.property('role');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Gets currently authenticated user profile."
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Dataset & Seeding",
+      "item": [
+        {
+          "name": "02.1 - Seed Dataset (Municipal Officer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Seeded dataset created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.tickets).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{officer_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/seed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "seed"]
+            },
+            "description": "Seeds dataset with sample NYC 311 complaints. Restricted to Municipal Officer."
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Citizen Complaint Submission & Verification",
+      "item": [
+        {
+          "name": "03.1 - Submit Complaint (Citizen)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Complaint created with status NEW\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('New');",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('ticket_number');",
+                  "    pm.collectionVariables.set(\"complaint_id\", jsonData.id);",
+                  "    pm.collectionVariables.set(\"ticket_number\", jsonData.ticket_number);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Streetlight\",\n  \"description\": \"There has been no street light near Gate 3 for almost a week and the road gets extremely dark.\",\n  \"location\": \"Gate 3, Central Park West & 72nd St\",\n  \"latitude\": 40.7789,\n  \"longitude\": -73.9742,\n  \"urgency\": \"Medium\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/complaints",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints"]
+            },
+            "description": "Submits a new complaint as a Citizen."
+          }
+        },
+        {
+          "name": "03.2 - Get Single Complaint Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Complaint details returned matching ID\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"complaint_id\"));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/complaints/{{complaint_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints", "{{complaint_id}}"]
+            },
+            "description": "Retrieves complaint by Mongo ID or Ticket Number."
+          }
+        },
+        {
+          "name": "03.3 - List Complaints Queue (Citizen Own Complaints)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Complaints queue array returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/complaints",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints"]
+            },
+            "description": "Lists complaints queue for logged in citizen."
+          }
+        },
+        {
+          "name": "03.4 - Add Citizen Comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Comment appended to audit trail\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.comments).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author\": \"Jane Citizen\",\n  \"content\": \"Additional info: The light fixture looks physically damaged.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/complaints/{{complaint_id}}/comments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints", "{{complaint_id}}", "comments"]
+            },
+            "description": "Adds a comment to a complaint ticket."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Municipal Officer Operations",
+      "item": [
+        {
+          "name": "04.1 - Assign Crew (Officer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Crew assigned and status set to Assigned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.assigned_to).to.eql(\"Electrical Dept Crew #4\");",
+                  "    pm.expect(jsonData.status).to.eql(\"Assigned\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officer_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assigned_to\": \"Electrical Dept Crew #4\",\n  \"note\": \"Field repair team dispatched for immediate inspection.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/complaints/{{complaint_id}}/assign",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints", "{{complaint_id}}", "assign"]
+            },
+            "description": "Assigns complaint to a field repair crew."
+          }
+        },
+        {
+          "name": "04.2 - Update Status -> In Progress (Officer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Status updated to In Progress\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"In Progress\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officer_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Progress\",\n  \"note\": \"Crew has arrived on site and started work.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/complaints/{{complaint_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints", "{{complaint_id}}", "status"]
+            },
+            "description": "Updates workflow status following state machine rules."
+          }
+        },
+        {
+          "name": "04.3 - Update Status -> Resolved (Officer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Status updated to Resolved\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql(\"Resolved\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{officer_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Resolved\",\n  \"note\": \"Bulb replaced and wiring tested successfully.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/complaints/{{complaint_id}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints", "{{complaint_id}}", "status"]
+            },
+            "description": "Resolves complaint ticket."
+          }
+        },
+        {
+          "name": "04.4 - View Analytics Dashboard (Officer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Dashboard analytics summary returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('total_complaints');",
+                  "    pm.expect(jsonData).to.have.property('sla_compliance_rate');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{officer_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics"]
+            },
+            "description": "Fetches analytics metrics for dashboard."
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Officer Query & Filter Operations",
+      "item": [
+        {
+          "name": "05.1 - Filter Complaints Queue (Officer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Filtered results returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{officer_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/complaints?status=New&category=Streetlight",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints"],
+              "query": [
+                { "key": "status", "value": "New" },
+                { "key": "category", "value": "Streetlight" }
+              ]
+            },
+            "description": "Filters queue by status and category for Officer."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - AI & NLP Utilities",
+      "item": [
+        {
+          "name": "06.1 - Classify Raw Citizen Description",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"NLP classification generated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.category).to.eql(\"Streetlight\");",
+                  "    pm.expect(jsonData).to.have.property('urgency');",
+                  "    pm.expect(jsonData).to.have.property('summary');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"There has been no street light near Gate 3 for almost a week and the road gets extremely dark.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/ai/classify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "ai", "classify"]
+            },
+            "description": "Local NLP text classification."
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Authorization Boundary Tests (RBAC Verification)",
+      "item": [
+        {
+          "name": "07.1 - Citizen Try Update Status (Expect 403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test(\"Access forbidden detail message returned\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.detail).to.include(\"Access forbidden\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Assigned\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/complaints/12345/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complaints", "12345", "status"]
+            },
+            "description": "Verifies Citizen cannot update complaint status."
+          }
+        },
+        {
+          "name": "07.2 - Citizen Try View Analytics (Expect 403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/analytics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analytics"]
+            },
+            "description": "Verifies Citizen cannot view analytics."
+          }
+        },
+        {
+          "name": "07.3 - Citizen Try Seed Dataset (Expect 403 Forbidden)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 403 Forbidden\", function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{citizen_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/seed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "seed"]
+            },
+            "description": "Verifies Citizen cannot seed database."
+          }
+        },
+        {
+          "name": "07.4 - Unauthenticated Access Attempt (Expect 401 Unauthorized)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Verifies requests without token return 401 Unauthorized."
+          }
+        }
+      ]
+    }
+  ]
+}

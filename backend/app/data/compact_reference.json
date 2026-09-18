@@ -1,0 +1,409 @@
+{
+  "source_file": "export.csv",
+  "generated_at": "1.5.5",
+  "total_distinct_categories": 50,
+  "top_categories": [
+    {
+      "category": "Illegal Parking",
+      "count": 1831117
+    },
+    {
+      "category": "Noise - Residential",
+      "count": 1303287
+    },
+    {
+      "category": "HEAT/HOT WATER",
+      "count": 913711
+    },
+    {
+      "category": "Blocked Driveway",
+      "count": 588888
+    },
+    {
+      "category": "Noise - Street/Sidewalk",
+      "count": 585502
+    },
+    {
+      "category": "UNSANITARY CONDITION",
+      "count": 415556
+    },
+    {
+      "category": "Street Condition",
+      "count": 280041
+    },
+    {
+      "category": "Water System",
+      "count": 237339
+    },
+    {
+      "category": "PLUMBING",
+      "count": 236037
+    },
+    {
+      "category": "Abandoned Vehicle",
+      "count": 232781
+    },
+    {
+      "category": "Noise - Commercial",
+      "count": 220432
+    },
+    {
+      "category": "PAINT/PLASTER",
+      "count": 211894
+    },
+    {
+      "category": "Dirty Condition",
+      "count": 206860
+    },
+    {
+      "category": "Noise",
+      "count": 186277
+    },
+    {
+      "category": "Noise - Vehicle",
+      "count": 163753
+    },
+    {
+      "category": "Traffic Signal Condition",
+      "count": 159531
+    },
+    {
+      "category": "DOOR/WINDOW",
+      "count": 158343
+    },
+    {
+      "category": "Derelict Vehicles",
+      "count": 150621
+    },
+    {
+      "category": "Encampment",
+      "count": 150064
+    },
+    {
+      "category": "WATER LEAK",
+      "count": 147481
+    },
+    {
+      "category": "Missed Collection",
+      "count": 138033
+    },
+    {
+      "category": "Homeless Person Assistance",
+      "count": 131190
+    },
+    {
+      "category": "Illegal Dumping",
+      "count": 130382
+    },
+    {
+      "category": "General Construction/Plumbing",
+      "count": 126540
+    },
+    {
+      "category": "Damaged Tree",
+      "count": 118653
+    },
+    {
+      "category": "Rodent",
+      "count": 117778
+    },
+    {
+      "category": "GENERAL",
+      "count": 116342
+    },
+    {
+      "category": "Street Light Condition",
+      "count": 107358
+    },
+    {
+      "category": "ELECTRIC",
+      "count": 102946
+    },
+    {
+      "category": "FLOORING/STAIRS",
+      "count": 93443
+    },
+    {
+      "category": "Sewer",
+      "count": 91647
+    },
+    {
+      "category": "Noise - Helicopter",
+      "count": 90786
+    },
+    {
+      "category": "Maintenance or Facility",
+      "count": 88551
+    },
+    {
+      "category": "Sidewalk Condition",
+      "count": 84846
+    },
+    {
+      "category": "Vendor Enforcement",
+      "count": 84280
+    },
+    {
+      "category": "Non-Emergency Police Matter",
+      "count": 81699
+    },
+    {
+      "category": "APPLIANCE",
+      "count": 78232
+    },
+    {
+      "category": "Snow or Ice",
+      "count": 77251
+    },
+    {
+      "category": "Overgrown Tree/Branches",
+      "count": 76634
+    },
+    {
+      "category": "Elevator",
+      "count": 74765
+    },
+    {
+      "category": "Building/Use",
+      "count": 73395
+    },
+    {
+      "category": "Drug Activity",
+      "count": 71767
+    },
+    {
+      "category": "Obstruction",
+      "count": 69331
+    },
+    {
+      "category": "For Hire Vehicle Complaint",
+      "count": 68105
+    },
+    {
+      "category": "Consumer Complaint",
+      "count": 66304
+    },
+    {
+      "category": "Graffiti",
+      "count": 65093
+    },
+    {
+      "category": "Lead",
+      "count": 61153
+    },
+    {
+      "category": "Residential Disposal Complaint",
+      "count": 47721
+    },
+    {
+      "category": "SAFETY",
+      "count": 44671
+    },
+    {
+      "category": "Food Establishment",
+      "count": 43242
+    }
+  ],
+  "top_descriptors": [
+    {
+      "descriptor": "Loud Music/Party",
+      "count": 1456672
+    },
+    {
+      "descriptor": "ENTIRE BUILDING",
+      "count": 600263
+    },
+    {
+      "descriptor": "Blocked Hydrant",
+      "count": 506548
+    },
+    {
+      "descriptor": "Posted Parking Sign Violation",
+      "count": 429965
+    },
+    {
+      "descriptor": "No Access",
+      "count": 428341
+    },
+    {
+      "descriptor": "Banging/Pounding",
+      "count": 426845
+    },
+    {
+      "descriptor": "APARTMENT ONLY",
+      "count": 313448
+    },
+    {
+      "descriptor": "N/A",
+      "count": 250815
+    },
+    {
+      "descriptor": "Blocked Sidewalk",
+      "count": 247155
+    },
+    {
+      "descriptor": "Loud Talking",
+      "count": 238801
+    },
+    {
+      "descriptor": "Trash",
+      "count": 238273
+    },
+    {
+      "descriptor": "With License Plate",
+      "count": 232781
+    },
+    {
+      "descriptor": "PESTS",
+      "count": 217711
+    },
+    {
+      "descriptor": "Pothole",
+      "count": 161606
+    },
+    {
+      "descriptor": "Partial Access",
+      "count": 160555
+    },
+    {
+      "descriptor": "Derelict Vehicles",
+      "count": 150621
+    },
+    {
+      "descriptor": "Commercial Overnight Parking",
+      "count": 140228
+    },
+    {
+      "descriptor": "MOLD",
+      "count": 119835
+    },
+    {
+      "descriptor": "Removal Request",
+      "count": 113074
+    },
+    {
+      "descriptor": "Blocked Crosswalk",
+      "count": 106797
+    },
+    {
+      "descriptor": "WALL",
+      "count": 103293
+    },
+    {
+      "descriptor": "Double Parked Blocking Traffic",
+      "count": 97923
+    },
+    {
+      "descriptor": "CEILING",
+      "count": 95760
+    },
+    {
+      "descriptor": "Car/Truck Music",
+      "count": 94501
+    },
+    {
+      "descriptor": "Other",
+      "count": 94401
+    },
+    {
+      "descriptor": "FLOOR",
+      "count": 89467
+    },
+    {
+      "descriptor": "DOOR",
+      "count": 83159
+    },
+    {
+      "descriptor": "Street Light Out",
+      "count": 79873
+    },
+    {
+      "descriptor": "Controller",
+      "count": 79065
+    },
+    {
+      "descriptor": "Rat Sighting",
+      "count": 74498
+    },
+    {
+      "descriptor": "Blocked Bike Lane",
+      "count": 73356
+    },
+    {
+      "descriptor": "WATER SUPPLY",
+      "count": 71554
+    },
+    {
+      "descriptor": "Parking Permit Improper Use",
+      "count": 71379
+    },
+    {
+      "descriptor": "Noise: Construction Before/After Hours (NM1)",
+      "count": 69597
+    },
+    {
+      "descriptor": "HEAVY FLOW",
+      "count": 68468
+    },
+    {
+      "descriptor": "Driver Complaint - Non Passenger",
+      "count": 67586
+    },
+    {
+      "descriptor": "GARBAGE/RECYCLING STORAGE",
+      "count": 65802
+    },
+    {
+      "descriptor": "Other (complaint details)",
+      "count": 64447
+    },
+    {
+      "descriptor": "Use Outside",
+      "count": 64251
+    },
+    {
+      "descriptor": "Graffiti",
+      "count": 62087
+    },
+    {
+      "descriptor": "BASIN/SINK",
+      "count": 60896
+    },
+    {
+      "descriptor": "Lead Kit Request (Residential) (L10)",
+      "count": 58546
+    },
+    {
+      "descriptor": "SLOW LEAK",
+      "count": 57441
+    },
+    {
+      "descriptor": "Food Vendor",
+      "count": 56871
+    },
+    {
+      "descriptor": "Double Parked Blocking Vehicle",
+      "count": 52621
+    },
+    {
+      "descriptor": "WINDOW FRAME",
+      "count": 51959
+    },
+    {
+      "descriptor": "Illegal Conversion Of Residential Building/Space",
+      "count": 51559
+    },
+    {
+      "descriptor": "Branch or Limb Has Fallen Down",
+      "count": 50204
+    },
+    {
+      "descriptor": "BATHTUB/SHOWER",
+      "count": 48706
+    },
+    {
+      "descriptor": "ELECTRIC/GAS RANGE",
+      "count": 46841
+    }
+  ]
+}
